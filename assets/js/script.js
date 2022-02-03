@@ -62,7 +62,7 @@ $(".list-group").on("blur", "textarea", function() {
 });
 
 var loadTasks = function() {
-  tasks = JSON.parse(localStorage.getItem("tasks"));
+  tasks = JSON.parse(localStorage.getItem("tasksgit
 
   // if nothing in localStorage, create a new object to track all task status arrays
   if (!tasks) {
