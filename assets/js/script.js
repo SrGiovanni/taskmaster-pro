@@ -18,6 +18,73 @@ var createTask = function(taskText, taskDate, taskList) {
   $("#list-" + taskList).append(taskLi);
 };
 
+// make cards sortable
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function(event) {
+    console.log("activate", this);
+  },
+  deactivate: function(event) {
+    console.log("deactivate", this);
+  },
+  over: function(event) {
+    console.log("over", event.target);
+  },
+  out: function(event) {
+    console.log("out", event.target);
+  },
+  update: function(event) {
+    // array to store the task data in
+    let tempArr = [];
+
+    // loop over current set of children in sortable list
+    $(this).children().each(function() {
+      let text = $(this)
+        .find("p")
+        .text()
+        .trim();
+
+      let date = $(this)
+        .find("span")
+        .text()
+        .trim();
+
+      // add task data to the temp array as an object
+      tempArr.push({
+        text: text,
+        date: date
+      });
+    });
+    // trim down list's ID to match object property
+    let arrName = $(this)
+      .attr("id")
+      .replace("list-", "");
+
+    // update array on tasks object and save
+    tasks[arrName] = tempArr;
+    saveTasks();
+  }
+});
+
+// make the Trash area a droppable are for task disposal
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function(event, ui) {
+    console.log("drop");
+    ui.draggable.remove();
+  },
+  over: function(event, ui) {
+    console.log("over");
+  },
+  out: function(event, ui) {
+    console.log("out");
+  }
+});
+
 //event listener for editing task text
 $(".list-group").on("click", "p", function() {
   var text = $(this)
@@ -99,7 +166,7 @@ $(".list-group").on("blur", "input[type='text']", function() {
     .closest(".list-group-item")
     .index();
 
-  // update task in array and re-save to localstorage
+  // update task in array and re-save to local storage
   tasks[status][index].date = date;
   saveTasks();
 
@@ -113,7 +180,7 @@ $(".list-group").on("blur", "input[type='text']", function() {
 });
 
 var loadTasks = function() {
-  tasks = JSON.parse(localStorage.getItem("tasksgit
+  tasks = JSON.parse(localStorage.getItem("tasks"));
 
   // if nothing in localStorage, create a new object to track all task status arrays
   if (!tasks) {
